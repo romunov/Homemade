@@ -1,4 +1,4 @@
-#' How to convert an ftable to a data.frame.
+#' How to convert an (f)table to a data.frame.
 #' 
 #' These two functions perform print.* for ftable and table class. They can be used in the same
 #' way. The side effect is that the returned object is now a list of two, where the first element
