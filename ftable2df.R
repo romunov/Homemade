@@ -34,6 +34,9 @@ ftable2df <- function(x, ...) {
 	print.ftable2(x, ...)
 }
 
+#' @return A list of two.
+#' \item{table}{The original table result that was passed onto the \code{table2df} function.}
+#' \item{data.frame}{A raw version of the data.frame that is used to print the table.}
 table2df <- function (x, digits = getOption("digits"), quote = FALSE, na.print = "", 
 		zero.print = "0", justify = "none", ...) {
 	
