@@ -1,5 +1,10 @@
 #' How to convert an ftable to a data.frame.
 #' 
+#' These two functions perform print.* for ftable and table class. They can be used in the same
+#' way. The side effect is that the returned object is now a list of two, where the first element
+#' (\code{table}) is as expected output of (f)table and the second element (\code{data.frame}) is
+#' an actual \code{data.frame} that can be passed to write functions, e.g. write.xlsx.
+#' 
 #' @author Roman Luštrik
 #' @return A list of two.
 #' \item{ftable}{The original ftable result that was passed onto the \code{ftable2df} function.}
@@ -29,11 +34,53 @@ ftable2df <- function(x, ...) {
 	print.ftable2(x, ...)
 }
 
+table2df <- function (x, digits = getOption("digits"), quote = FALSE, na.print = "", 
+		zero.print = "0", justify = "none", ...) {
+	
+	xx <- format(unclass(x), digits = digits, justify = justify)
+	if (any(ina <- is.na(x))) 
+		xx[ina] <- na.print
+	if (zero.print != "0" && any(i0 <- !ina & x == 0) && all(x == 
+					round(x))) 
+		xx[i0] <- sub("0", zero.print, xx[i0])
+	
+	if (is.numeric(x) || is.complex(x)) {
+		print(xx, quote = quote, right = TRUE, ...)
+	}	else {
+		print(xx, quote = quote, ...)
+	} 
+	
+	## mold xx to a data.frame
+	
+	# prepare column and row names
+	var.names <- names(attributes(x)$dimnames)
+	rowname <- var.names[1]
+	colname <- var.names[2]
+	
+	## We strip x to a matrix, add row names and then construct two labels,
+	## one will add column label and the other will add row label and column names
+	raw.x <- matrix(as.numeric(x), nrow = nrow(x)) 
+	first.row <- matrix(c("", colname, rep("", length(colnames(x))-1)), nrow = 1)
+	second.row <- matrix(c(rowname, colnames(x)), nrow = 1)
+	first.column <- matrix(rownames(x), ncol = 1)
+	xx <- rbind(first.row, second.row, cbind(first.column, raw.x))
+	
+	x <- list(table = x, data.frame = as.data.frame(xx))
+	invisible(x)
+}
+
 #' @examples 
 #' \dontrun
-#' my.table <- ftable(Titanic, row.vars = 1:3)
-#' my.table <- ftable2df(my.table) # you can access the original table with object$
+#' my.ftable <- ftable(Titanic, row.vars = 1:3)
+#' my.ftable <- ftable2df(my.ftable) # you can access the original table with object$
 #' 
 #' require(xlsx)
+#' write.xlsx(x = my.ftable$data.frame, file = "write.df.xlsx", sheetName = "TestfTable",
+#'		row.names = FALSE, col.names = FALSE)
+#' 
+#' #' require(xlsx)
+#' my.table <- with(warpbreaks, table(wool, tension))
+#' my.table <- table2df(my.table)
+#' 
 #' write.xlsx(x = my.table$data.frame, file = "write.df.xlsx", sheetName = "TestTable",
 #'		row.names = FALSE, col.names = FALSE)
