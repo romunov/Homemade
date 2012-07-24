@@ -1,0 +1,37 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[slovene]{babel}
+\usepackage[buttonsize=1em]{animate}
+
+\title{}
+\author{Roman Luštrik}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+<<echo=FALSE>>=
+options(width = 60) 
+pdf.options(encoding = "CP1250")
+rm(list = ls())
+@
+
+<<fig.show='animate', dev='png', out.width='.45\\linewidth', fig.align = "center", interval=.5, aniopts='controls,loop,autoplay'>>=
+set.seed(357)
+xy <- data.frame(x = runif(100, min = 0, max = 1), y = runif(100, min = 0, max = 1))
+
+for (i in seq(from = 20, to = 100, length.out = 9)) {
+  plot(xy[1:i, ], xlim = c(0, 1), ylim = c(0, 1))
+}
+
+@
+
+
+\newpage
+<<>>=
+sessionInfo()
+@
+
+\end{document}
